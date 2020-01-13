@@ -16,35 +16,24 @@ import java.io.IOException;
 
 public class SamtoolsTestUtilsTest extends HtsjdkTest {
 
-    @Test
-    public void testSamtoolsIsAvailable() {
-        Assert.assertTrue(SamtoolsTestUtils.isSamtoolsAvailable());
-    }
-
-    @Test
+    @Test(testName = "testSamtoolsVersion")
     public void testSamtoolsVersion() {
-        if (!SamtoolsTestUtils.isSamtoolsAvailable()) {
-            throw new SkipException("Samtools not available on local device");
-        }
+        isSamtoolsIsAvailable();
         // If this test runs, but fails because version validation fails, then the local samtools version is
-        // not the one expected by the htsjdk tests
+        // not the one expected by the htsjdk test
         final ProcessExecutor.ExitStatusAndOutput processStatus = SamtoolsTestUtils.executeSamToolsCommand("--version");
         Assert.assertTrue(processStatus.stdout.contains(SamtoolsTestUtils.expectedSamtoolsVersion));
     }
 
     @Test(expectedExceptions = RuntimeException.class)
     public void testSamtoolsPresentButCommandFails() {
-        if (!SamtoolsTestUtils.isSamtoolsAvailable()) {
-            throw new SkipException("Samtools not available on local device");
-        }
+        isSamtoolsIsAvailable();
         SamtoolsTestUtils.executeSamToolsCommand("--notASamtoolsCommand");
     }
 
-    @Test
+    @Test(testName = "testCRAMConversion")
     public void testCRAMConversion()throws IOException {
-        if (!SamtoolsTestUtils.isSamtoolsAvailable()) {
-            throw new SkipException("Samtools not available on local device");
-        }
+        isSamtoolsIsAvailable();
 
         // Validates CRAM conversion.
         final File TEST_DATA_DIR = new File("src/test/resources/htsjdk/samtools/cram");
@@ -65,6 +54,12 @@ public class SamtoolsTestUtilsTest extends HtsjdkTest {
                 Assert.assertEquals(originalIt.next(), samtoolsIt.next());
             }
             Assert.assertEquals(samtoolsIt.hasNext(), originalIt.hasNext());
+        }
+    }
+
+    private static void isSamtoolsIsAvailable() {
+        if (!SamtoolsTestUtils.isSamtoolsAvailable()) {
+            throw new SkipException("Samtools not available on local device");
         }
     }
 }
